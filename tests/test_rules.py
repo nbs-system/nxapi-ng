@@ -40,3 +40,11 @@ class TestRules(TestCase):
         errors, warnings = rules.validate(rule)
         self.assertEqual(errors, [])
         self.assertEqual(warnings, ['rule IDs below 10k are reserved (5)'])
+
+        rule = {'negative': True, 'detection': 'str:pif', 'msg': 'test msg', 'mz': 'BODY|URL|WRONG', 'score': '$XSS:3',
+                'sid': 100005}
+        errors, warnings = rules.validate(rule)
+        print(errors)
+        self.assertIn("WRONG' is not a known sub-part of mz", str(errors))
+        self.assertEqual(warnings, [])
+

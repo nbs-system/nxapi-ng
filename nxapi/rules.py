@@ -101,17 +101,18 @@ def parse_rule(full_str):
     lexer.whitespace_split = True
     try:
         split = list(lexer)
-        #split = list(iter(lexer.get_token, ''))
     except ValueError:
         errors.append('No closing quotation in your rule')
+        return errors, warnings, ret
+
+    duplicate = [k for k,v in collections.Counter(split).items() if v > 1]
+    if duplicate:
+        errors.append("Duplicates elements: %s" % ', '.join(duplicate))
         return errors, warnings, ret
 
     intersection = set(split).intersection(set(mr_kw))
     if not intersection:
         errors.append("No mainrule/basicrule keyword.")
-        return errors, warnings, ret
-    elif len(intersection) > 1:
-        errors.append("Multiple mainrule/basicrule keywords.")
         return errors, warnings, ret
 
     split.remove(intersection.pop())  # remove the mainrule/basicrule keyword
@@ -124,8 +125,6 @@ def parse_rule(full_str):
 
         if keyword.endswith(";"):  # remove semi-colons
             keyword = keyword[:-1]
-        if keyword.startswith(('"', "'")) and (keyword[0] == keyword[-1]):  # remove (double-)quotes
-            keyword = keyword[1:-1]
 
         parsed = False
         for frag_kw in func_map:

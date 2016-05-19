@@ -55,6 +55,31 @@ class TestRules(TestCase):
         self.assertEqual(ret, {'msg:': 'magento XSS', 's:': '$UWA:8', 'id:': '42000466',
                                'mz:': ['$ARGS_VAR:bridgename'], 'str:': 'str:"'})
 
+        rule = 'MainRule "str:\\"" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA:8" "id:42000466;'
+        errors, warnings, ret = rules.parse_rule(rule)
+        self.assertEqual(errors, ['No closing quotation in your rule'])
+        self.assertEqual(warnings, [])
+        self.assertEqual(ret, {})
+
+        rule = '"str:\\"" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA:8" id:42000466;'
+        errors, warnings, ret = rules.parse_rule(rule)
+        self.assertEqual(errors, ['No mainrule/basicrule keyword.'])
+        self.assertEqual(warnings, [])
+        self.assertEqual(ret, {})
+
+        rule = 'MainRule MainRule "str:a" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA:8" id:42000466;'
+        errors, warnings, ret = rules.parse_rule(rule)
+        self.assertEqual(errors, ['Duplicates elements: MainRule'])
+        self.assertEqual(warnings, [])
+        self.assertEqual(ret, {})
+
+        rule = 'MainRule wrong "str:a" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA:8" id:42000466;'
+        errors, warnings, ret = rules.parse_rule(rule)
+        self.assertEqual(errors, ["'wrong' is an invalid element and thus can not be parsed."])
+        self.assertEqual(warnings, [])
+        self.assertEqual(ret, {})
+
+
     def test_validate(self):
         rule = {'negative': True, 'detection': 'str:pif', 'msg': 'test msg', 'mz': 'BODY', 'score': '$XSS:3', 'sid': 5}
         errors, warnings = rules.validate(rule)

@@ -86,7 +86,7 @@ def parse_rule(full_str):
     """
     Parse and validate a full naxsi rule
     :param str full_str: Textual representation of a rule.
-    :return dict:
+    :return list, list, dict:
     """
     warnings = list()
     errors = list()

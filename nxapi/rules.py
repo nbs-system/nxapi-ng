@@ -97,10 +97,11 @@ def parse_rule(full_str):
                 "mz:": __validate_matchzone, "negative": lambda e, w, p_str: p_str == 'checked',
                 "s:": __validate_score}
 
-    lexer = shlex(full_str)
+    lexer = shlex(full_str, posix=True)
     lexer.whitespace_split = True
     try:
-        split = list(iter(lexer.get_token, ''))
+        split = list(lexer)
+        #split = list(iter(lexer.get_token, ''))
     except ValueError:
         errors.append('No closing quotation in your rule')
         return errors, warnings, ret

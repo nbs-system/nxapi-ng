@@ -110,6 +110,10 @@ def parse_rule(full_str):
         errors.append("Duplicates elements: %s" % ', '.join(duplicate))
         return errors, warnings, ret
 
+    if 'BasicRule' in split and 'MainRule' in split:
+        errors.append("Both BasicRule and MainRule are present.")
+        return errors, warnings, ret
+
     intersection = set(split).intersection(set(mr_kw))
     if not intersection:
         errors.append("No mainrule/basicrule keyword.")
@@ -197,6 +201,7 @@ def __validate_detection_rx(warnings, errors, p_str):
             errors.append("{} is not a valid regex:".format(p_str))
     except ImportError:  # python-pcre is an optional dependency
         pass
+    return errors, warnings
 
 
 def __validate_score(warnings, errors, p_str):
@@ -208,7 +213,7 @@ def __validate_score(warnings, errors, p_str):
             errors.append("Your value '{}' for your score '{}' is not numeric.".format(value, score))
         elif not name.startswith('$'):
             errors.append("Your name '{}' for your score '{}' does not start with a '$'.".format(name, score))
-    return warnings, errors
+    return errors, warnings
 
 
 def __validate_matchzone(warnings, errors, p_str):
@@ -239,7 +244,7 @@ def __validate_matchzone(warnings, errors, p_str):
 
     if has_zone is False:
         errors.append("The rule/whitelist doesn't target any zone.")
-    return warnings, errors
+    return errors, warnings
 
 
 def __validate_id(warnings, errors, p_str):
@@ -249,4 +254,4 @@ def __validate_id(warnings, errors, p_str):
             warnings.append("rule IDs below 10k are reserved ({0})".format(num))
     except ValueError:
         errors.append("id:{0} is not numeric".format(p_str))
-    return warnings, errors
+    return errors, warnings

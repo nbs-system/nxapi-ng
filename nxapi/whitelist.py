@@ -27,10 +27,10 @@ def parse(str_wl):
         if piece == 'BasicRule':
             continue
         elif piece.startswith('wl:'):
-            __validate_wl(warnings, errors, piece[3:])
+            __validate_wl(warnings, errors, piece[3:].split(','))
             if errors:
                 return errors, warnings, ret
-            ret['wl'] = piece[3:]
+            ret['wl'] = [int(i) for i in piece[3:].split(',')]
         elif piece.startswith('mz:'):
             ret['mz'] = piece[3:]
         elif piece == 'negative':
@@ -57,8 +57,15 @@ def validate(wl):
 
 
 def __validate_wl(warnings, errors, wl):
-    if not re.match(r'(\-?\d+,)*\-?\d+', wl):
-        errors.append('Illegal character in the wl.')
+    """
+    :param list of str warnings:
+    :param list of str errors:
+    :param str wl:
+    :return list, list: warnings, errors
+    """
+    for wid in wl:
+        if not re.match(r'(\-?\d+,)*\-?\d+', wid):
+            errors.append('Illegal character in the wl.')
     return errors, warnings
 
 
@@ -68,19 +75,17 @@ def explain(wlist):
         #if NaxsiRules.query.filter(NaxsiRules.sid == self.wid).first() is None:
         #    return _rid
         #return '<a href="{}">{}</a>'.format(url_for('rules.view', sid=_rid), self.wid)
-
-    if wlist['wl'] == '0':
-        ret = 'Whitelist all rules'
-    elif wlist['wl'].isdigit():
-        ret = 'Whitelist the rule {}'.format(__linkify_rule(wlist['wl']))
-    else:
-        zones = list()
-        for rid in wlist['wl'].split(','):
-            if rid.startswith('-'):
-                zones.append('except the rule {}'.format(__linkify_rule(rid[1:])))
+    ret = 'Whitelist '
+    for wil in wlist['wl']:
+        if 0 == wil:
+            ret += 'all rules'
+        else:
+            zones = list()
+            if wil < 0:
+                    zones.append('except the rule {}'.format(__linkify_rule(abs(wil))))
             else:
-                zones.append('the rule {}'.format(__linkify_rule(rid)))
-        ret = 'Whitelist ' + ', '.join(zones)
+                zones.append('the rule {}'.format(__linkify_rule(wil)))
+            ret += ', '.join(zones)
 
     if 'mz' in wlist:
         return ret + ' if matching in {}.'.format(wlist['mz'])

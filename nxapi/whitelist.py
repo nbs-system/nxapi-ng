@@ -39,8 +39,8 @@ def parse(str_wl):
             errors.append('Unknown fragment: {}'.format(piece))
             return errors, warnings, ret
 
-        if not piece.islower():
-            warnings.append('Your whitelist is not completely in lowercase.')
+        #if not piece.islower():
+        #    warnings.append('Your whitelist is not completely in lowercase.')
 
     if 'BasicRule' not in split:
         errors.append("No 'BasicRule' keyword in {}.".format(str_wl))
@@ -82,7 +82,6 @@ def explain(wlist):
                 zones.append('the rule {}'.format(__linkify_rule(rid)))
         ret = 'Whitelist ' + ', '.join(zones)
 
-    if not wlist['mz']:
-        return ret + '.'
-
-    return ret + ' if matching in {}.'.format(wlist['mz'])
+    if 'mz' in wlist:
+        return ret + ' if matching in {}.'.format(wlist['mz'])
+    return ret + '.'

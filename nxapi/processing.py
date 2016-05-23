@@ -1,4 +1,5 @@
 import re
+import itertools
 
 def process(rule, nxlog):
     """
@@ -17,21 +18,10 @@ def check_whitelist(rule, nxlog):
     :param dict nxlog:
     :return bool: Did the `rule` whitelisted the `nxlog`?
     """
+    for i in itertools.count():
+        if 'zone%d' % i not in nxlog:
+            break
+        elif nxlog['zone%d' % i] == rule['mz']:
+            return True
+    return False
 
-    for key, value in nxlog.items():
-        if key.startswith('zone'):
-            number = key[len('zone'):]
-            _id = nxlog['id' + number]
-            for zone in rule['mz']:
-                if value in zone:  # great, the zone in the nxlog is present in the rule
-                    if zone.startswith('$'):  # a specific variable in the rule's current zone
-                        if zone.split(':')[1] == nxlog['var_name' + number]:  # the variable is matching!
-                            continue
-                else:
-                    return False
-
-
-            # One of the zones in the nxlog isn't in the rule.
-            if not any(value.startswith(zone) for zone in rule['mz']):
-                return False
-    return True

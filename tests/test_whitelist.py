@@ -64,11 +64,6 @@ class TestWhitelist(TestCase):
         self.assertEqual(errors, ['Illegal character in the wl.'])
         self.assertEqual(warnings, [])
 
-        wlist = 'BasicRule wl:15200 negative "mz:$ARGS_VAR:foo|$URL:/bar";'
-        errors, warnings, ret = whitelist.parse(wlist)
-        self.assertEqual(errors, [])
-        self.assertEqual(warnings, [])
-
         wlist = 'BasicRule wl:15200 wrong "mz:$ARGS_VAR:foo|$URL:/bar";'
         errors, warnings, ret = whitelist.parse(wlist)
         self.assertEqual(errors, ['Unknown fragment: wrong'])

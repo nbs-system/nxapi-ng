@@ -34,8 +34,6 @@ def parse(str_wl):
         elif piece.startswith('mz:'):
             __validate_mz(warnings, errors, piece[3:])
             ret['mz'] = piece[3:]
-        elif piece == 'negative':
-            ret['negative '] = True
         else:
             errors.append('Unknown fragment: {}'.format(piece))
             return errors, warnings, ret

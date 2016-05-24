@@ -59,6 +59,26 @@ class TestWhitelist(TestCase):
         self.assertEqual(errors, ['No closing quotation in your whitelist'])
         self.assertEqual(warnings, [])
 
+        wlist = 'BasicRule wl:pouet "mz:$ARGS_VAR:foo|$URL:/bar";'
+        errors, warnings, ret = whitelist.parse(wlist)
+        self.assertEqual(errors, ['Illegal character in the wl.'])
+        self.assertEqual(warnings, [])
+
+        wlist = 'BasicRule wl:15200 negative "mz:$ARGS_VAR:foo|$URL:/bar";'
+        errors, warnings, ret = whitelist.parse(wlist)
+        self.assertEqual(errors, [])
+        self.assertEqual(warnings, [])
+
+        wlist = 'BasicRule wl:15200 wrong "mz:$ARGS_VAR:foo|$URL:/bar";'
+        errors, warnings, ret = whitelist.parse(wlist)
+        self.assertEqual(errors, ['Unknown fragment: wrong'])
+        self.assertEqual(warnings, [])
+
+        wlist = 'wl:15200 "mz:$ARGS_VAR:foo|$URL:/bar";'
+        errors, warnings, ret = whitelist.parse(wlist)
+        self.assertEqual(errors, ["No 'BasicRule' keyword."])
+        self.assertEqual(warnings, [])
+
     def test_validate(self):
         wlist = {'wl': [1000], 'mz': '$ARGS_VAR_X:^meh_[0-9]+$'}
         errors, warnings = whitelist.validate(wlist)
@@ -126,3 +146,9 @@ class TestWhitelist(TestCase):
 
         wlist = {'mz': '$ARGS_VAR:foo|$URL:/bar', 'wl': [1000]}
         self.assertEqual(whitelist.explain(wlist), 'Whitelist the rule 1000 if matching in $ARGS_VAR:foo|$URL:/bar.')
+
+        wlist = {'mz': '$ARGS_VAR:foo|$URL:/bar', 'wl': [0]}
+        self.assertEqual(whitelist.explain(wlist), 'Whitelist all rules if matching in $ARGS_VAR:foo|$URL:/bar.')
+
+        wlist = {'mz': '$ARGS_VAR:foo|$URL:/bar', 'wl': [-10]}
+        self.assertEqual(whitelist.explain(wlist), 'Whitelist all rules except the rule 10 if matching in $ARGS_VAR:foo|$URL:/bar.')

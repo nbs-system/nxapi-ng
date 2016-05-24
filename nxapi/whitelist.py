@@ -40,7 +40,7 @@ def parse(str_wl):
             return errors, warnings, ret
 
     if 'BasicRule' not in split:
-        errors.append("No 'BasicRule' keyword in {}.".format(str_wl))
+        errors.append("No 'BasicRule' keyword.")
         return errors, warnings, ret
 
     return errors, warnings, ret
@@ -110,7 +110,11 @@ def explain(wlist):
         #if NaxsiRules.query.filter(NaxsiRules.sid == self.wid).first() is None:
         #    return _rid
         #return '<a href="{}">{}</a>'.format(url_for('rules.view', sid=_rid), self.wid)
+    negative = False
     ret = 'Whitelist '
+    if any(i < 0 for i in wlist['wl']):
+        ret += 'all rules '
+        negative = True
     for wil in wlist['wl']:
         if 0 == wil:
             ret += 'all rules'
@@ -118,7 +122,7 @@ def explain(wlist):
             zones = list()
             if wil < 0:
                     zones.append('except the rule {}'.format(__linkify_rule(abs(wil))))
-            else:
+            elif not negative:
                 zones.append('the rule {}'.format(__linkify_rule(wil)))
             ret += ', '.join(zones)
 

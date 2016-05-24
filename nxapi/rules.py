@@ -36,19 +36,19 @@ def explain(rule):
     """
     translation = {'ARGS': 'argument', 'BODY': 'body', 'URL': 'url', 'HEADER': 'header',
                    'HEADER:Cookie': 'cookies'}
-    explanation = 'The rule number <strong>{0}</strong> is '.format(rule['sid'])
+    explanation = 'The rule number *{0}* is '.format(rule['sid'])
     if rule['negative']:
-        explanation += '<strong>not</strong> '
+        explanation += '*not* '
     explanation += 'setting the '
 
     scores = []
     for score in rule['score'].split(','):
-        scores.append('<strong>{0}</strong> score to <strong>{1}</strong> '.format(*score.split(':', 1)))
+        scores.append('*{0}* score to *{1}* '.format(*score.split(':', 1)))
     explanation += ', '.join(scores) + 'when it '
     if rule['detection'].startswith('str:'):
-        explanation += 'finds the string <strong>{}</strong> '.format(rule['detection'][4:])
+        explanation += 'finds the string *{}* '.format(rule['detection'][4:])
     else:
-        explanation += 'matches the regexp <strong>{}</strong> in '.format(rule['detection'][3:])
+        explanation += 'matches the regexp *{}* in '.format(rule['detection'][3:])
 
     zones = []
     for mz in rule['mz'].split('|'):
@@ -66,11 +66,11 @@ def explain(rule):
             else:
                 regexp = "matching regex" if current_zone.endswith("_X") else ""
                 if zone_name == 'header' and arg.lower() == 'cookie':
-                    zones.append('in the <strong>cookies</strong>')
+                    zones.append('in the *cookies*')
                 else:
                     zones.append("in the var with name {} '{}' of {} ".format(regexp, arg, zone_name))
         else:
-            zones.append('the <strong>{0}</strong>'.format(translation[mz]))
+            zones.append('the *{0}*'.format(translation[mz]))
     return explanation + ' ' + ', '.join(zones) + '.'
 
 

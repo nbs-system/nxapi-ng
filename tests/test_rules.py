@@ -13,14 +13,14 @@ class TestRules(TestCase):
     def test_explain(self):
         rule = {'negative': True, 'detection': 'str:pif', 'msg': 'test msg', 'mz': 'BODY', 'score': '$XSS:3', 'sid': 5}
         self.assertEqual(rules.explain(rule),
-                         'The rule number <strong>5</strong> is <strong>not</strong> setting the <strong>$XSS</strong>'
-                         ' score to <strong>3</strong> when it finds the string <strong>pif</strong>'
-                         '  the <strong>body</strong>.')
+                         'The rule number *5* is *not* setting the *$XSS*'
+                         ' score to *3* when it finds the string *pif*'
+                         '  the *body*.')
         rule = {'negative': True, 'detection': 'str:pif', 'msg': 'test msg', 'mz': 'BODY|URL', 'score': '$XSS:3', 'sid': 5}
         self.assertEqual(rules.explain(rule),
-                         'The rule number <strong>5</strong> is <strong>not</strong> setting the <strong>$XSS</strong>'
-                         ' score to <strong>3</strong> when it finds the string <strong>pif</strong>'
-                         '  the <strong>body</strong>, the <strong>url</strong>.')
+                         'The rule number *5* is *not* setting the *$XSS*'
+                         ' score to *3* when it finds the string *pif*'
+                         '  the *body*, the *url*.')
 
     def test_parse(self):
         rule = 'MainRule negative "str:a" "msg:t" "mz:BODY" "s:$XSS:3" id:5 ;'

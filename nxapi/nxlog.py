@@ -38,7 +38,7 @@ def explain_nxlog(nxlog):
     :return str: A textual explaination of the `nxlog`
     """
 
-    explain = "Peer <strong>{}</strong> performed a request to <strong>{}</strong> on URI <strong>{}</strong> ".format(
+    explain = "Peer *{}* performed a request to *{}* on URI *{}* ".format(
         nxlog['ip'], nxlog['server'], nxlog['uri'])
 
     scores = list()
@@ -46,7 +46,7 @@ def explain_nxlog(nxlog):
     while "cscore{}".format(cpt) in nxlog:
         cscore = "cscore{}".format(cpt)
         score = "score{}".format(cpt)
-        scores.append("that reached a <strong>{}</strong> score of <strong>{}</strong> ".format(
+        scores.append("that reached a *{}* score of *{}* ".format(
             nxlog[cscore], nxlog[score]))
         cpt += 1
     explain += ' and '.join(scores)
@@ -58,10 +58,10 @@ def explain_nxlog(nxlog):
         _var_name = "var_name{}".format(cpt)
         _zone = "zone{}".format(cpt)
         if "var_name{}".format(cpt) in nxlog:
-            named.append("id <strong>{}</strong> in var named <strong>{}</strong> of zone <strong>{}</strong>".format(
+            named.append("id *{}* in var named *{}* of zone *{}*".format(
                 nxlog[_id], nxlog[_var_name], nxlog[_zone]))
         else:
-            named.append("id <strong>{}</strong> in zone <strong>{}</strong>".format(nxlog[_id], nxlog[_zone]))
+            named.append("id *{}* in zone *{}*".format(nxlog[_id], nxlog[_zone]))
         cpt += 1
     explain += ' and '.join(named)
 

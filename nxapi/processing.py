@@ -18,10 +18,11 @@ def check_whitelist(rule, nxlog):
     :param dict nxlog:
     :return bool: Did the `rule` whitelisted the `nxlog`?
     """
-    for i in itertools.count():
-        if 'zone%d' % i not in nxlog:
-            break
-        elif nxlog['zone%d' % i] == rule['mz']:
-            return True
-    return False
-
+    for mz in rule['mz'].split('|'):
+        for nb in itertools.count():
+            zone = nxlog.get('zone%d' % nb, '')
+            if not zone:
+                break
+            elif zone not in mz:
+                return False
+    return True

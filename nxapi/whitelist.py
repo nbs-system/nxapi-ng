@@ -100,9 +100,6 @@ def __validate_mz(warnings, errors, mz):
         if _mz[0].endswith('_X') ^ _mz[1].endswith('_X') and _mz[1] != 'NAME':
             errors.append('You can not use regexp matchzone with non-regexp one')
             return errors, warnings
-        #if _mz[0].startswith('$URL'):
-            #if _mz[0].endswith('_X'):
-
         elif _mz[0].startswith('$URL') and (_mz[1] == 'NAME'):
             errors.append('You can not use $URL and NAME')
             return errors, warnings

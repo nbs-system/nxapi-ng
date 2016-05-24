@@ -123,7 +123,7 @@ class TestWhitelist(TestCase):
         wlist = {'wl': [1000], 'mz': 'ARGS|$ARGS_VAR_X|NAME'}
         errors, warnings = whitelist.validate(wlist)
         self.assertEqual(errors, ['You can not use regexp matchzone with non-regexp one'])
-        self.assertEqual(warnings, [])
+        self.assertEqual(warnings, ['Your three parts matchzone does not starts with $URL'])
 
         wlist = {'wl': [1000], 'mz': 'ARGS:WRONG'}
         errors, warnings = whitelist.validate(wlist)

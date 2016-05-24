@@ -75,7 +75,9 @@ def __validate_mz(warnings, errors, mz):
         if _mz[2] != 'NAME':
             errors.append('The last argument of your matchzone with two pipes is not "NAME"')
             return errors, warnings
-        elif _mz[0].endswith('_X') ^ _mz[1].endswith('_X') and _mz[1] != 'NAME':
+        if not _mz[0].startswith('$URL'):
+            warnings.append('Your three parts matchzone does not starts with $URL')
+        if _mz[0].endswith('_X') ^ _mz[1].endswith('_X') and _mz[1] != 'NAME':
             errors.append('You can not use regexp matchzone with non-regexp one' % _mz)
             return errors, warnings
     elif len(_mz) == 2:

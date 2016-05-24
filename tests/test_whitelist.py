@@ -90,22 +90,27 @@ class TestWhitelist(TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(warnings, [])
 
-        wlist = {'wl': [1000], 'mz': '$ARGS_VAR_X|ARGS_VAR_X|ARGS_VAR_X$'}
+        wlist = {'wl': [1000], 'mz': '$ARGS_VAR_X|$ARGS_VAR_X|$ARGS_VAR_X'}
         errors, warnings = whitelist.validate(wlist)
         self.assertEqual(errors, ['The last argument of your matchzone with two pipes is not "NAME"'])
         self.assertEqual(warnings, [])
 
         wlist = {'wl': [1000], 'mz': '|||'}
         errors, warnings = whitelist.validate(wlist)
+        self.assertEqual(errors, ['The matchzone  is not valid.'])
+        self.assertEqual(warnings, [])
+
+        wlist = {'wl': [1000], 'mz': '$ARGS_VAR_X|$ARGS_VAR_X|$ARGS_VAR_X|$ARGS_VAR_X'}
+        errors, warnings = whitelist.validate(wlist)
         self.assertEqual(errors, ['The matchzone has more than 2 pipes.'])
         self.assertEqual(warnings, [])
 
         wlist = {'wl': [1000], 'mz': '|'}
         errors, warnings = whitelist.validate(wlist)
-        self.assertEqual(errors, [])
+        self.assertEqual(errors, ['The matchzone  is not valid.'])
         self.assertEqual(warnings, [])
 
-        wlist = {'wl': [1000], 'mz': '$ARGS_VAR_X:lol|ARGS_VAR_X'}
+        wlist = {'wl': [1000], 'mz': '$ARGS_VAR_X:lol|$ARGS_VAR_X'}
         errors, warnings = whitelist.validate(wlist)
         self.assertEqual(errors, ['You can not use regexp matchzone with non-regexp one'])
         self.assertEqual(warnings, [])
@@ -130,6 +135,25 @@ class TestWhitelist(TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(warnings, ['The expression WRONG is not in lowercase.'])
 
+        wlist = {'wl': [1000], 'mz': '$ARGS_VAR_X:^/tutu[pouet'}
+        errors, warnings = whitelist.validate(wlist)
+        self.assertEqual(errors, ['The regexp ^/tutu[pouet is invalid.'])
+        self.assertEqual(warnings, [])
+
+        wlist = {'wl': [1000], 'mz': 'ARGS_VAR_X:pouet'}
+        errors, warnings = whitelist.validate(wlist)
+        self.assertEqual(errors, ['The matchzone ARGS_VAR_X is not valid.'])
+        self.assertEqual(warnings, [])
+
+        wlist = {'wl': [1000], 'mz': '$URL:pouet|NAME'}
+        errors, warnings = whitelist.validate(wlist)
+        self.assertEqual(errors, ['You can not use $URL and NAME'])
+        self.assertEqual(warnings, [])
+
+        wlist = {'wl': [1000], 'mz': 'WRONG'}
+        errors, warnings = whitelist.validate(wlist)
+        self.assertEqual(errors, ['The matchzone WRONG is not valid.'])
+        self.assertEqual(warnings, [])
 
     def test_explain(self):
         wlist = {'wl': [1000], 'mz': '$ARGS_VAR_X:^meh_[0-9]+$'}

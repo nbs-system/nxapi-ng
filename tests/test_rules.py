@@ -79,6 +79,35 @@ class TestRules(TestCase):
         self.assertEqual(warnings, [])
         self.assertEqual(ret, {})
 
+        rule = 'MainRule BasicRule "str:a" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA:8" id:42000466;'
+        errors, warnings, ret = rules.parse_rule(rule)
+        self.assertEqual(errors, ['Both BasicRule and MainRule are present.'])
+        self.assertEqual(warnings, [])
+        self.assertEqual(ret, {})
+
+        rule = 'MainRule "str:a" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA" id:42000466;'
+        errors, warnings, ret = rules.parse_rule(rule)
+        self.assertEqual(errors, ["You score '$UWA' has no value or name.", "Parsing of element 's:$UWA' failed."])
+        self.assertEqual(warnings, [])
+
+        rule = 'MainRule "str:a" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA:A" id:42000466;'
+        errors, warnings, ret = rules.parse_rule(rule)
+        self.assertEqual(errors, ["Your value 'A' for your score '$UWA:A' is not numeric.",
+                                  "Parsing of element 's:$UWA:A' failed."])
+        self.assertEqual(warnings, [])
+
+        rule = 'MainRule "str:a" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA:" id:42000466;'
+        errors, warnings, ret = rules.parse_rule(rule)
+        self.assertEqual(errors, ["Your value '' for your score '$UWA:' is not numeric.",
+                                  "Parsing of element 's:$UWA:' failed."])
+        self.assertEqual(warnings, [])
+
+        rule = 'MainRule "str:a" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA:3" id:POUET;'
+        errors, warnings, ret = rules.parse_rule(rule)
+        self.assertEqual(errors, ['id:POUET is not numeric', "Parsing of element 'id:POUET' failed."])
+        self.assertEqual(warnings, [])
+
+
 
     def test_validate(self):
         rule = {'negative': True, 'detection': 'str:pif', 'msg': 'test msg', 'mz': 'BODY', 'score': '$XSS:3', 'sid': 5}

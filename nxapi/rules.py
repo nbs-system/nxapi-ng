@@ -74,14 +74,6 @@ def explain(rule):
     return explanation + ' ' + ', '.join(zones) + '.'
 
 
-def test_rule(rule, request):
-    if rule['detection'].startswith('rx:'):
-        try:
-            import pcre
-        except ImportError:
-            raise ImportError
-
-
 def parse_rule(full_str):
     """
     Parse and validate a full naxsi rule
@@ -146,7 +138,7 @@ def parse_rule(full_str):
                         payload = payload.split('|')
                     ret[keyword[:len(frag_kw)]] = payload
                     break
-                errors.append("parsing of element '{0}' failed.".format(keyword))
+                errors.append("Parsing of element '{0}' failed.".format(keyword))
                 return errors, warnings, ret
 
         if parsed is False:  # we have an item that wasn't successfully parsed
@@ -208,9 +200,11 @@ def __validate_score(warnings, errors, p_str):
     for score in p_str.split(','):
         if ':' not in score:
             errors.append("You score '{}' has no value or name.".format(score))
+            return errors, warnings
         name, value = score.split(':')
         if not value.isdigit():
             errors.append("Your value '{}' for your score '{}' is not numeric.".format(value, score))
+            return errors, warnings
         elif not name.startswith('$'):
             errors.append("Your name '{}' for your score '{}' does not start with a '$'.".format(name, score))
     return errors, warnings

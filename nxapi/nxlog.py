@@ -2,7 +2,7 @@ try:
     from urlparse import parse_qs
 except ImportError:  # python3
     from urllib.parse import parse_qs
-
+import re
 
 def parse_nxlog(nxlog):
     """
@@ -12,6 +12,8 @@ def parse_nxlog(nxlog):
     """
     errors = list()
     ret = dict()
+
+    #re.match(r'\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} \[error\]')
 
     start = nxlog.find("ip=")
     if start < 0:

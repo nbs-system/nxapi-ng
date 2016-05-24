@@ -85,10 +85,6 @@ class TestWhitelist(TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(warnings, [])
 
-        wlist = {'wl': [1000], 'mz': ['ARGS', 'ARGS', 'ARGS']}
-        errors, warnings = whitelist.validate(wlist)
-        self.assertEqual(errors, ['The last argument of your matchzone with two pipes is not "NAME"'])
-
         wlist = {'wl': [1000], 'mz': ['ARGS', 'ARGS', 'ARGS', 'ARGS']}
         errors, warnings = whitelist.validate(wlist)
         self.assertEqual(errors, ['The matchzone has more than 2 pipes.'])
@@ -126,14 +122,13 @@ class TestWhitelist(TestCase):
         errors, warnings = whitelist.validate(wlist)
         self.assertEqual(errors, ['You can not use $URL and NAME'])
 
-        wlist = {'wl': [1000], 'mz': ['WRONG']}
+        wlist = {'wl': [1000], 'mz': ['$URL']}
         errors, warnings = whitelist.validate(wlist)
-        self.assertEqual(errors, ['The matchzone WRONG is not valid.'])
+        self.assertEqual(errors, ['The matchzone %s starts with a $, but has no variables'])
 
-        wlist = {'wl': [1000], 'mz': ['BODY', 'BODY', 'BODY']}
+        wlist = {'wl': [1000], 'mz': ['ARGS', 'ARGS', 'NAME']}
         errors, warnings = whitelist.validate(wlist)
-        self.assertEqual(errors, ['The last argument of your matchzone with two pipes is not "NAME"'])
-
+        self.assertEqual(warnings, ['Your three parts matchzone does not starts with $URL'])
 
     def test_explain(self):
         wlist = {'wl': [1000], 'mz': ['$ARGS_VAR_X:^meh_[0-9]+$']}

@@ -32,8 +32,8 @@ def parse(str_wl):
                 return errors, warnings, ret
             ret['wl'] = [int(i) for i in piece[3:].split(',')]
         elif piece.startswith('mz:'):
-            __validate_mz(warnings, errors, piece[3:])
-            ret['mz'] = piece[3:]
+            __validate_mz(warnings, errors, piece[3:].split('|'))
+            ret['mz'] = piece[3:].split('|')
         else:
             errors.append('Unknown fragment: {}'.format(piece))
             return errors, warnings, ret
@@ -65,42 +65,47 @@ def __validate_mz(warnings, errors, mz):
     valid_named_zones = ['$ARGS_VAR', '$HEADERS_VAR', '$BODY_VAR', '$URL']
     valid_regexp_zones = ['$ARGS_VAR_X', '$HEADERS_VAR_X', '$BODY_VAR_X', '$URL_X']
 
-    _mz = mz.split('|')
-    for m in _mz:
-        try:
-            s = m.split(':', 1)
-            if s[0] not in valid_zones + valid_named_zones + valid_regexp_zones + ['NAME']:
-                errors.append('The matchzone %s is not valid.' % s[0])
+    use_regexp = False
+
+    for matchzone in mz:
+        zone, var = (matchzone, None) if ':' not in matchzone else matchzone.split(':', 1)
+
+        if zone not in valid_zones + valid_named_zones + valid_regexp_zones + ['NAME']:
+            errors.append('The matchzone %s is not valid.' % zone)
+            return errors, warnings
+
+        if not zone.startswith('$') and use_regexp:
+            errors.append('You can not use regexp matchzone with non-regexp one')
+            return errors, warnings
+
+        if not var:  # there is no ':' char in the `matchzone`
+            if zone.startswith('$'):
+                errors.append('The matchzone %s starts with a $, but has no variables')
                 return errors, warnings
-            if not s[1].islower():
-                warnings.append('The expression %s is not in lowercase.' % s[1])
-            if s[0].endswith('_X'):
+        else:
+            if not var.islower():
+                warnings.append('The expression %s is not in lowercase.' % var)
+            if zone.endswith('_X'):
+                use_regexp = True
+
                 try:
-                    pcre.compile(s[1])
+                    pcre.compile(var)
                 except pcre.PCREError:
-                    errors.append('The regexp %s is invalid.' % s[1])
+                    errors.append('The regexp %s is invalid.' % var)
                     return errors, warnings
-        except IndexError:
-            continue
-    if len(_mz) > 3:
+
+    if len(mz) > 3:
         errors.append('The matchzone has more than 2 pipes.')
         return errors, warnings
-    elif len(_mz) == 3:
-        if _mz[2] != 'NAME':
+    elif len(mz) == 3:
+        if mz[2] != 'NAME':
             errors.append('The last argument of your matchzone with two pipes is not "NAME"')
             return errors, warnings
-        if not _mz[0].startswith('$URL'):
+        if not mz[0].startswith('$URL'):
             warnings.append('Your three parts matchzone does not starts with $URL')
-        if _mz[0].endswith('_X') ^ _mz[1].endswith('_X') and _mz[1] != 'NAME':
-            errors.append('You can not use regexp matchzone with non-regexp one')
-            return errors, warnings
-    elif len(_mz) == 2:
-        if _mz[0].endswith('_X') ^ _mz[1].endswith('_X') and _mz[1] != 'NAME':
-            errors.append('You can not use regexp matchzone with non-regexp one')
-            return errors, warnings
-        elif _mz[0].startswith('$URL') and (_mz[1] == 'NAME'):
-            errors.append('You can not use $URL and NAME')
-            return errors, warnings
+    if 1< len(mz) < 4 and mz[0].startswith('$URL') and (mz[1] == 'NAME'):
+        errors.append('You can not use $URL and NAME')
+        return errors, warnings
     return errors, warnings
 
 
@@ -142,5 +147,5 @@ def explain(wlist):
             ret += ', '.join(zones)
 
     if 'mz' in wlist:
-        return ret + ' if matching in {}.'.format(wlist['mz'])
+        return ret + ' if matching in {}.'.format(' in '.join(wlist['mz']))
     return ret + '.'

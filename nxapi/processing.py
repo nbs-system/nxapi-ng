@@ -22,7 +22,7 @@ def check_whitelist(rule, nxlog):
                     if pcre.match(mz_var, nxlog['var_name%d' % nb], pcre.I) and nxlog_zone == mz_zone[1:-6]:
                         matched = True
                 elif nxlog['var_name%d' % nb] == mz_var and nxlog_zone == mz_zone[1:-4]:
-                        matched = True
+                    matched = True
             elif nxlog_zone in mz:  # zone without argument
                 matched = True
 

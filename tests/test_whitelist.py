@@ -93,7 +93,7 @@ class TestWhitelist(TestCase):
         errors, warnings = whitelist.validate(wlist)
         self.assertEqual(errors, ['You can not use regexp matchzone with non-regexp one'])
 
-        wlist = {'wl': [1000], 'mz': ['$ARGS_VAR_X:lol','$ARGS_VAR_X:lol','$ARGS_VAR_X:lol']}
+        wlist = {'wl': [1000], 'mz': ['$ARGS_VAR_X:lol', '$ARGS_VAR_X:lol', '$ARGS_VAR_X:lol']}
         errors, warnings = whitelist.validate(wlist)
         self.assertEqual(errors, ['The last argument of your matchzone with two pipes is not "NAME"'])
 
@@ -150,4 +150,5 @@ class TestWhitelist(TestCase):
         self.assertEqual(whitelist.explain(wlist), 'Whitelist all rules if matching in $ARGS_VAR:foo in $URL:/bar.')
 
         wlist = {'mz': ['$ARGS_VAR:foo', '$URL:/bar'], 'wl': [-10]}
-        self.assertEqual(whitelist.explain(wlist), 'Whitelist all rules except the rule 10 if matching in $ARGS_VAR:foo in $URL:/bar.')
+        self.assertEqual(whitelist.explain(wlist),
+                         'Whitelist all rules except the rule 10 if matching in $ARGS_VAR:foo in $URL:/bar.')

@@ -4,6 +4,7 @@ except ImportError:  # python3
     from urllib.parse import parse_qs
 import re
 
+
 def parse_nxlog(nxlog):
     """
 
@@ -22,7 +23,7 @@ def parse_nxlog(nxlog):
 
     end = nxlog.find(", ")
     if end < 0:
-        errors.append('%s is an invalid extlog, string "," not found.' %nxlog)
+        errors.append('%s is an invalid extlog, string "," not found.' % nxlog)
         return errors, ret
 
     # Flatten the dict, since parse_qs is a bit annoying

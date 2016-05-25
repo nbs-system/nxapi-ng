@@ -97,7 +97,7 @@ def parse_rule(full_str):
         errors.append('No closing quotation in your rule')
         return errors, warnings, ret
 
-    duplicate = [k for k,v in collections.Counter(split).items() if v > 1]
+    duplicate = [k for k, v in collections.Counter(split).items() if v > 1]
     if duplicate:
         errors.append("Duplicates elements: %s" % ', '.join(duplicate))
         return errors, warnings, ret

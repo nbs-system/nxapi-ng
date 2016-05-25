@@ -103,7 +103,7 @@ def __validate_mz(warnings, errors, mz):
             return errors, warnings
         if not mz[0].startswith('$URL'):
             warnings.append('Your three parts matchzone does not starts with $URL')
-    if 1< len(mz) < 4 and mz[0].startswith('$URL') and (mz[1] == 'NAME'):
+    if 1 < len(mz) < 4 and mz[0].startswith('$URL') and (mz[1] == 'NAME'):
         errors.append('You can not use $URL and NAME')
         return errors, warnings
     return errors, warnings
@@ -141,7 +141,7 @@ def explain(wlist):
         else:
             zones = list()
             if wil < 0:
-                    zones.append('except the rule {}'.format(__linkify_rule(abs(wil))))
+                zones.append('except the rule {}'.format(__linkify_rule(abs(wil))))
             elif not negative:
                 zones.append('the rule {}'.format(__linkify_rule(wil)))
             ret += ', '.join(zones)

@@ -16,7 +16,8 @@ class TestRules(TestCase):
                          'The rule number <strong>5</strong> is <strong>not</strong> setting the <strong>$XSS</strong>'
                          ' score to <strong>3</strong> when it finds the string <strong>pif</strong>'
                          '  the <strong>body</strong>.')
-        rule = {'negative': True, 'detection': 'str:pif', 'msg': 'test msg', 'mz': 'BODY|URL', 'score': '$XSS:3', 'sid': 5}
+        rule = {'negative': True, 'detection': 'str:pif', 'msg': 'test msg', 'mz': 'BODY|URL', 'score': '$XSS:3',
+                'sid': 5}
         self.assertEqual(rules.explain(rule),
                          'The rule number <strong>5</strong> is <strong>not</strong> setting the <strong>$XSS</strong>'
                          ' score to <strong>3</strong> when it finds the string <strong>pif</strong>'
@@ -27,13 +28,15 @@ class TestRules(TestCase):
         errors, warnings, ret = rules.parse_rule(rule)
         self.assertEqual(errors, [])
         self.assertEqual(warnings, ['rule IDs below 10k are reserved (5)'])
-        self.assertEqual(ret, {'mz:': ['BODY'], 'str:': 'str:a', 's:': '$XSS:3', 'negative': '', 'id:': '5', 'msg:': 't'})
+        self.assertEqual(ret, {'mz:': ['BODY'], 'str:': 'str:a', 's:': '$XSS:3', 'negative': '', 'id:': '5',
+                               'msg:': 't'})
 
         rule = 'MainRule negative "str:a" "msg:t" "mz:BODY|URL" "s:$XSS:3" id:5 ;'
         errors, warnings, ret = rules.parse_rule(rule)
         self.assertEqual(errors, [])
         self.assertEqual(warnings, ['rule IDs below 10k are reserved (5)'])
-        self.assertEqual(ret, {'mz:': ['BODY', 'URL'], 'str:': 'str:a', 's:': '$XSS:3', 'negative': '', 'id:': '5', 'msg:': 't'})
+        self.assertEqual(ret, {'mz:': ['BODY', 'URL'], 'str:': 'str:a', 's:': '$XSS:3', 'negative': '', 'id:': '5',
+                               'msg:': 't'})
 
         rule = 'MainRule negative "rx:^[\da-z_]+$" "mz:$ARGS_VAR:id|$BODY_VAR:id" "s:$LOG_TEST:1" id:42000456;'
         errors, warnings, ret = rules.parse_rule(rule)
@@ -107,8 +110,6 @@ class TestRules(TestCase):
         self.assertEqual(errors, ['id:POUET is not numeric', "Parsing of element 'id:POUET' failed."])
         self.assertEqual(warnings, [])
 
-
-
     def test_validate(self):
         rule = {'negative': True, 'detection': 'str:pif', 'msg': 'test msg', 'mz': 'BODY', 'score': '$XSS:3', 'sid': 5}
         errors, warnings = rules.validate(rule)
@@ -121,4 +122,3 @@ class TestRules(TestCase):
         print(errors)
         self.assertIn("WRONG' is not a known sub-part of mz", str(errors))
         self.assertEqual(warnings, [])
-

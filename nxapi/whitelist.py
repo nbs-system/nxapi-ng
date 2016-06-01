@@ -2,6 +2,10 @@ import shlex
 import pcre
 
 
+def dict_to_str(wl):
+    return 'BasicRule wl:%s "mz:%s" ;' % (','.join(map(str, wl['wl'])), '|'.join(wl['mz']))
+
+
 def parse(str_wl):
     """
 

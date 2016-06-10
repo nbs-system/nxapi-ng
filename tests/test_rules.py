@@ -28,34 +28,34 @@ class TestRules(TestCase):
         errors, warnings, ret = rules.parse_rule(rule)
         self.assertEqual(errors, [])
         self.assertEqual(warnings, ['rule IDs below 10k are reserved (5)'])
-        self.assertEqual(ret, {'mz:': ['BODY'], 'str:': 'str:a', 's:': '$XSS:3', 'negative': '', 'id:': '5',
+        self.assertEqual(ret, {'mz:': ['BODY'], 'str:': 'str:a', 's:': '$XSS:3', 'negative': '', 'id:': 5,
                                'msg:': 't'})
 
         rule = 'MainRule negative "str:a" "msg:t" "mz:BODY|URL" "s:$XSS:3" id:5 ;'
         errors, warnings, ret = rules.parse_rule(rule)
         self.assertEqual(errors, [])
         self.assertEqual(warnings, ['rule IDs below 10k are reserved (5)'])
-        self.assertEqual(ret, {'mz:': ['BODY', 'URL'], 'str:': 'str:a', 's:': '$XSS:3', 'negative': '', 'id:': '5',
+        self.assertEqual(ret, {'mz:': ['BODY', 'URL'], 'str:': 'str:a', 's:': '$XSS:3', 'negative': '', 'id:': 5,
                                'msg:': 't'})
 
         rule = 'MainRule negative "rx:^[\da-z_]+$" "mz:$ARGS_VAR:id|$BODY_VAR:id" "s:$LOG_TEST:1" id:42000456;'
         errors, warnings, ret = rules.parse_rule(rule)
         self.assertEqual(errors, [])
         self.assertEqual(warnings, [])
-        self.assertEqual(ret, {'rx:': 'rx:^[\\da-z_]+$', 'negative': '', 's:': '$LOG_TEST:1', 'id:': '42000456', 'mz:':
+        self.assertEqual(ret, {'rx:': 'rx:^[\\da-z_]+$', 'negative': '', 's:': '$LOG_TEST:1', 'id:': 42000456, 'mz:':
             ['$ARGS_VAR:id', '$BODY_VAR:id']})
 
         rule = 'MainRule "str:encoding=\\"utf-16\\"" "mz:BODY" "s:$UWA:8" id:42000459;'
         errors, warnings, ret = rules.parse_rule(rule)
         self.assertEqual(errors, [])
         self.assertEqual(warnings, [])
-        self.assertEqual(ret, {'mz:': ['BODY'], 'str:': 'str:encoding="utf-16"', 's:': '$UWA:8', 'id:': '42000459'})
+        self.assertEqual(ret, {'mz:': ['BODY'], 'str:': 'str:encoding="utf-16"', 's:': '$UWA:8', 'id:': 42000459})
 
         rule = 'MainRule "str:\\"" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA:8" id:42000466;'
         errors, warnings, ret = rules.parse_rule(rule)
         self.assertEqual(errors, [])
         self.assertEqual(warnings, [])
-        self.assertEqual(ret, {'msg:': 'magento XSS', 's:': '$UWA:8', 'id:': '42000466',
+        self.assertEqual(ret, {'msg:': 'magento XSS', 's:': '$UWA:8', 'id:': 42000466,
                                'mz:': ['$ARGS_VAR:bridgename'], 'str:': 'str:"'})
 
         rule = 'MainRule "str:\\"" "msg:magento XSS" "mz:$ARGS_VAR:bridgename" "s:$UWA:8" "id:42000466;'
@@ -122,3 +122,7 @@ class TestRules(TestCase):
         print(errors)
         self.assertIn("WRONG' is not a known sub-part of mz", str(errors))
         self.assertEqual(warnings, [])
+
+    def test_get_description_core(self):
+        self.assertEqual(rules.get_description_core(10), 'invalid hex encoding, null bytes')
+        self.assertEqual(rules.get_description_core(-10), 'id -10')

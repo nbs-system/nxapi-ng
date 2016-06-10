@@ -2,7 +2,8 @@ try:
     from urlparse import parse_qs
 except ImportError:  # python3
     from urllib.parse import parse_qs
-import re
+
+import rules
 
 
 def parse_nxlog(nxlog):
@@ -61,8 +62,8 @@ def explain_nxlog(nxlog):
         _var_name = "var_name{}".format(cpt)
         _zone = "zone{}".format(cpt)
         if "var_name{}".format(cpt) in nxlog:
-            named.append("id <strong>{}</strong> in var named <strong>{}</strong> of zone <strong>{}</strong>".format(
-                nxlog[_id], nxlog[_var_name], nxlog[_zone]))
+            named.append("<strong>{}</strong> in var named <strong>{}</strong> of zone <strong>{}</strong>".format(
+                rules.get_description_core(nxlog[_id]), nxlog[_var_name], nxlog[_zone]))
         else:
             named.append("id <strong>{}</strong> in zone <strong>{}</strong>".format(nxlog[_id], nxlog[_zone]))
         cpt += 1

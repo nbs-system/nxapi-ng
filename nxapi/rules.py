@@ -1,5 +1,6 @@
 from shlex import shlex
 import collections
+import os
 
 mr_kw = ["MainRule", "BasicRule", "main_rule", "basic_rule"]
 static_mz = {"$ARGS_VAR", "$BODY_VAR", "$URL", "$HEADERS_VAR"}
@@ -16,6 +17,18 @@ sub_mz = list(static_mz) + list(full_zones) + list(rx_mz)
         - score
         - sid
 """
+
+
+def get_description_core(rule_id):
+    for line in open(os.path.join(os.path.dirname(__file__), 'data/naxsi_core.rules')):
+        if line.startswith('#@'):  # core rules are commented in a weird fashion
+            line = line[2:]
+        elif line.startswith('#'):  # real comment
+            continue
+        _, _, rule = parse_rule(line)
+        if rule['id:'] == rule_id:
+            return rule['msg:']
+    return 'id %s' % rule_id
 
 
 def short_str(rule):
@@ -136,6 +149,8 @@ def parse_rule(full_str):
                     parsed = True
                     if frag_kw == 'mz:':  # we want matchzones in a list
                         payload = payload.split('|')
+                    if frag_kw == 'id:':
+                        payload = int(payload)
                     ret[keyword[:len(frag_kw)]] = payload
                     break
                 errors.append("Parsing of element '{0}' failed.".format(keyword))

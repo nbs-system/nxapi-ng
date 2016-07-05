@@ -152,3 +152,16 @@ class TestWhitelist(TestCase):
         wlist = {'mz': ['$ARGS_VAR:foo', '$URL:/bar'], 'wl': [-10]}
         self.assertEqual(whitelist.explain(wlist),
                          'Whitelist all rules except the rule 10 if matching in $ARGS_VAR:foo in $URL:/bar.')
+
+    def test_redundant(self):
+        wlists = [
+            {'mz': ['$ARGS_VAR:foo', '$URL:/bar'], 'wl': [1000]},
+            {'mz': ['$ARGS_VAR:foo', '$URL:/bar'], 'wl': [1001]}
+            ]
+        wlist = {'mz': ['$ARGS_VAR:foo', '$URL:/bar'], 'wl': [1001]}
+        ret = whitelist.is_redundant(wlist, wlists)
+        self.assertTrue(ret)
+
+        wlist = {'mz': ['$ARGS_VAR:foo', '$URL:/bar'], 'wl': [1002]}
+        ret = whitelist.is_redundant(wlist, wlists)
+        self.assertFalse(ret)

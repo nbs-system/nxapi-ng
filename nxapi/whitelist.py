@@ -7,6 +7,19 @@ def dict_to_str(wl):
                                             '"msg:%s"' % wl['msg'] if 'msg' in wl else '')
 
 
+def is_redundant(wl, wls):
+    """
+    Check if a given `wl` is redundant in regard to `wls`.
+    :param dict wl:
+    :param list of dict wls:
+    :return bool:
+    """
+    for _wl in wls:
+        if set(wl['wl']).issubset(set(_wl['wl'])) and set(wl['mz']).issubset(set(wl['mz'])):
+            return True
+    return False
+
+
 def parse(str_wl):
     """
 

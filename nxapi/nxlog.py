@@ -3,7 +3,7 @@ try:
 except ImportError:  # python3
     from urllib.parse import parse_qs
 
-import rules
+from . import rules
 
 
 def parse_nxlog(nxlog):

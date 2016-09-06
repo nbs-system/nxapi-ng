@@ -17,14 +17,21 @@ def parse_nxlog(nxlog):
 
     #re.match(r'\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} \[error\]')
 
+
     start = nxlog.find("ip=")
     if start < 0:
-        errors.append('%s is an invalid extlog, string "ip=" not found.' % nxlog)
+        errors.append('%s is an invalid extlog or nxlog, string "ip=" not found.' % nxlog)
         return errors, ret
 
-    end = nxlog.find(", ")
-    if end < 0:
-        errors.append('%s is an invalid extlog, string "," not found.' % nxlog)
+    if '[error]' in nxlog:
+        end = nxlog.find(", ")
+        if end < 0:
+            errors.append('%s is an invalid nxlog, string "," not found.' % nxlog)
+            return errors, ret
+    elif '[debug]' in nxlog:
+        end = len(nxlog)
+    else:
+        errors.append('% is an invalid line: no [debug] or [error] found.' % nxlog)
         return errors, ret
 
     # Flatten the dict, since parse_qs is a bit annoying

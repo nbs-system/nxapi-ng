@@ -3,8 +3,17 @@ import pcre
 
 
 def dict_to_str(wl):
-    return 'BasicRule wl:%s "mz:%s" %s;' % (','.join(map(str, wl['wl'])), '|'.join(wl['mz']),
-                                            '"msg:%s"' % wl['msg'] if 'msg' in wl else '')
+    ret = 'BasicRule '
+    if 'wl' in wl:
+        ret += 'wl:%s ' % ','.join(map(str, wl['wl']))
+    if 'id' in wl:
+        ret += 'id:%s ' % ','.join(map(str, wl['id']))
+    if 'mz' in wl:
+        ret += '"mz:%s" ' % ','.join(map(str, wl['mz']))
+    if 'msg' in wl:
+        ret += '"msg:%s"' % wl['msg']
+
+    return ret
 
 
 def is_redundant(wl, wls):

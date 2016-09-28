@@ -17,7 +17,6 @@ def parse_nxlog(nxlog):
 
     #re.match(r'\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} \[error\]')
 
-
     start = nxlog.find("ip=")
     if start < 0:
         errors.append('%s is an invalid extlog or nxlog, string "ip=" not found.' % nxlog)

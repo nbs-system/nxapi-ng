@@ -6,8 +6,6 @@ def dict_to_str(wl):
     ret = 'BasicRule '
     if 'wl' in wl:
         ret += 'wl:%s ' % ','.join(map(str, wl['wl']))
-    if 'id' in wl:
-        ret += 'id:%s ' % ','.join(map(str, wl['id']))
     if 'mz' in wl:
         ret += '"mz:%s" ' % ','.join(map(str, wl['mz']))
     if 'msg' in wl:

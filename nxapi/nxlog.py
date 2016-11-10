@@ -30,7 +30,7 @@ def parse_nxlog(nxlog):
     elif '[debug]' in nxlog:
         end = len(nxlog)
     else:
-        errors.append('% is an invalid line: no [debug] or [error] found.' % nxlog)
+        errors.append('%s is an invalid line: no [debug] or [error] found.' % nxlog)
         return errors, ret
 
     # Flatten the dict, since parse_qs is a bit annoying

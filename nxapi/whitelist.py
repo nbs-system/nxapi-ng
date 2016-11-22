@@ -1,4 +1,5 @@
 import shlex
+import json
 import pcre
 
 
@@ -7,7 +8,7 @@ def dict_to_str(wl):
     if 'wl' in wl:
         ret += 'wl:%s ' % ','.join(map(str, wl['wl']))
     if 'mz' in wl:
-        ret += '"mz:%s" ' % ','.join(map(str, wl['mz']))
+        ret += json.dumps('mz:%s' % ','.join(map(str, wl['mz']))) + ' '
     if 'msg' in wl:
         ret += '"msg:%s"' % wl['msg']
 

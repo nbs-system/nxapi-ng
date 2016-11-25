@@ -26,7 +26,7 @@ def get_description_core(rule_id):
         elif line.startswith('#'):  # real comment
             continue
         _, _, rule = parse_rule(line)
-        if rule['id:'] == rule_id:
+        if rule['id:'] == int(rule_id):
             return rule['msg:']
     return 'id %s' % rule_id
 

@@ -6,7 +6,7 @@ import pcre
 def dict_to_str(wl):
     ret = 'BasicRule '
     if 'wl' in wl:
-        ret += 'wl:%s ' % ','.join(map(str, wl['wl']))
+        ret += 'wl:%s ' % ','.join(map(str, sorted(wl['wl'])))
     if 'mz' in wl:
         ret += json.dumps('mz:%s' % ','.join(map(str, wl['mz']))) + ' '
     if 'msg' in wl:

@@ -62,7 +62,7 @@ def parse_nxlog(nxlog):
         ret[key] = value[0]
 
     ret['date'] = unify_date(date)
-    ret['coords'] = coords(ip)
+    ret['coords'] = coords(ret['ip'])
     return list(), ret
 
 

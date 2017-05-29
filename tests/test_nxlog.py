@@ -16,7 +16,7 @@ class TestProcessing(TestCase):
                                'total_blocked': '204', 'ip': 'X.X.X.X', 'server': 'Y.Y.Y.Y',
                                'learning': '0', 'zone0': 'HEADERS', 'score0': '8',
                                'var_name0': 'user-agent', 'cscore0': '$UWA', 'id0': '42000227',
-                               'total_processed': '472', 'vers': '0.52', 'date': '20131110T07:36:19', 'coords'= None})
+                               'total_processed': '472', 'vers': '0.52', 'date': '20131110T07:36:19', 'coords': None})
 
     def test_parse_date(self):
         _nxlog = list()

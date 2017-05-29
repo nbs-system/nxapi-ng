@@ -146,7 +146,7 @@ def unify_date(date):
         return ""
     return z
 
-def coords(ip, db='nxapi/data/GeoIPCity_stripped_down.dat'):
+def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):
     ret=None
     try:
         import GeoIP

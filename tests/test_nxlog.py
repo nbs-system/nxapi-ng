@@ -53,7 +53,7 @@ class TestProcessing(TestCase):
             ret.append(nxlog.unify_date(_date))
         self.assertEqual(ret, ['20131110T07:36:19', '20130310T14:36:19', '20130310T07:36:19', '20170707T07:36:19', '20170204T07:36:19'])
         
-    def test_coords(self,  db='nxapi/data/GeoIPCity_stripped_down.dat'):
+    def test_coords(self, 'nxapi/data/GeoIPCity_stripped_down.dat'):
         _ips=['198.41.0.4', '192.33.4.12', '192.5.5.241', '2001:500:9f::42', '2001:500:84::b' ]
         ret=list()
         for _ip in _ips:

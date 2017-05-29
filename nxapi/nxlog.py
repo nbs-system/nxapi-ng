@@ -1,4 +1,3 @@
-import time
 from datetime import datetime
 import logging
 import re
@@ -147,7 +146,7 @@ def unify_date(date):
         return ""
     return z
 
-def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):
+def coords(ip, db='nxapi/data/GeoIPCity_stripped_down.dat'):
     ret=None
     try:
         import GeoIP
@@ -170,7 +169,7 @@ def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):
         r = gi.record_by_addr(ip)
     elif ip_type==6:
         pass
-    # For the moment there's no useable ipv6 city database
+    # For the moment there's no useable open ipv6 city database
     if r is not None:
-        ret= "[%s, %s]" % (r['latitude'], r['longitude'])
+        ret= "[%f, %f]" % (round(float(r['latitude']),4), round(float(r['longitude']),4))
     return ret

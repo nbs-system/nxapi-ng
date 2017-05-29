@@ -13,8 +13,7 @@ python:
 addons:
   apt:
     packages:
-    - cmake
-    - time
+    - libgeoip-dev
 
 script:
   - pip install coveralls nose2 nose2-cov

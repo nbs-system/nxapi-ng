@@ -1,2 +1,2 @@
 python-pcre
-python-GeoIP
+GeoIP

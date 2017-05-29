@@ -10,6 +10,12 @@ python:
   - "3.5-dev"
   - "nightly"
 
+addons:
+  apt:
+    packages:
+    - cmake
+    - time
+
 script:
   - pip install coveralls nose2 nose2-cov
   - coverage run --source=nxapi -m nose2.__main__ -v

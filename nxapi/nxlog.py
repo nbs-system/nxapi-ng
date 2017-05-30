@@ -2,6 +2,8 @@ from datetime import datetime
 import logging
 import re
 import socket
+import copy
+import itertools
 
 try:
     from urlparse import parse_qs
@@ -27,15 +29,21 @@ def parse_date(nxlog):
         if match:
             ret = match.group(0)
     return ret
-        
+
+def test():
+    line="""2017-02-20T10:59:03+01:00 rp-ch-01 nginx: 2017/02/20 10:59:03 [error] 31557#0: *40698245 NAXSI_FMT: ip=37.70.112.1&server=www.astrowi.preprod-ch.bscast11.nbs-test.com&uri=/horoscope-voyance&learning=1&vers=0.55.3&total_processed=11&total_blocked=11&block=1&cscore0=$SQL&score0=40&cscore1=$XSS&score1=64&zone0=HEADERS&id0=1005&var_name0=cookie&zone1=HEADERS&id1=1010&var_name1=cookie&zone2=HEADERS&id2=1011&var_name2=cookie&zone3=HEADERS&id3=1315&var_name3=cookie, client: 37.70.112.1, server: www.astrowi.preprod-ch.bscast11.nbs-test.com, request: "GET /horoscope-voyance HTTP/1.1", host: "www.astrowi.preprod-ch.bscast11.nbs-test.com", referrer: "http://www.astrowi.preprod-ch.bscast11.nbs-test.com/"""
+    return parse_nxlog(line)
+
+
 def parse_nxlog(nxlog):
     """
 
-    :param str nxlog: A naxsi log ( https://github.com/nbs-system/naxsi/wiki/naxsilogs )
-    :return list, dict: A list of errors, and the dictionary representation of the `nxlog`
+    :param str nxlog: A naxsi log ( https://github.com/nbs-system/naxsi/wiki/naxsilogs )  
+  :return list, dict: A list of errors, and the dictionary representation of the `nxlog`
     """
     errors = list()
-    ret = dict()
+    ret = list()
+    raw_dict = dict()
     #re.match(r'\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} \[error\]')
 
     date = parse_date(nxlog)
@@ -56,12 +64,29 @@ def parse_nxlog(nxlog):
         return errors, ret
 
     # Flatten the dict, since parse_qs is a bit annoying
-    ret = parse_qs(nxlog[start:end])
-    for key, value in ret.items():
-        ret[key] = value[0]
+    raw_dict = parse_qs(nxlog[start:end])
+    for key, value in raw_dict.items():
+        raw_dict[key] = value[0]
 
-    ret['date'] = unify_date(date)
-    ret['coords'] = coords(ret['ip'])
+    # We may have a multi-line event
+    min_dict = dict()
+    for key in raw_dict:
+        if not key.startswith('id') and not key.startswith('zone') and not key.startswith('var_name'):
+            min_dict[key]=raw_dict[key]
+
+    min_dict['date'] = unify_date(date)
+    min_dict['coords'] = coords(min_dict['ip'])
+    
+    for i in itertools.count():
+        if "id%d" % i in raw_dict and "var_name%d" %i in raw_dict and "zone%d" %i in raw_dict:
+            ret.append(copy.copy(min_dict))
+            ret[-1]['id'] = raw_dict['id%d' %i]
+            ret[-1]['var_name'] = raw_dict['var_name%d' %i]
+            ret[-1]['zone'] = raw_dict['zone%d' %i]
+        else:
+            break
+
+
     return list(), ret
 
 

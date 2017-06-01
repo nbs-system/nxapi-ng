@@ -12,15 +12,17 @@ except ImportError:  # python3
 
 from . import rules
 
+date_regex = re.compile("""(((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)""" \
+                        """\s+([0-3]?[0-9])|([0-2]0[0-3][0-9](/|-)(0?[0-9]|1[0-2])""" \
+                        """(/|-)([0-3][0-9])))\s+[0-1][0-9|2[0-3]):[0-5][0-9]:[0-5][0-9]""" \
+                        """(\+0[0-9]|1[0-2])?""")
+
+
 def parse_date(nxlog):
     """
     :param str nxlog: A naxsi log ( https://github.com/nbs-system/naxsi/wiki/naxsilogs )
     :return string: date string or empty string if we fail to find a date
     """
-    date_regex = re.compile("""(((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)""" \
-                                """\s+([0-3]?[0-9])|([0-2]0[0-3][0-9](/|-)(0?[0-9]|1[0-2])""" \
-                                """(/|-)([0-3][0-9])))\s+[0-1][0-9|2[0-3]):[0-5][0-9]:[0-5][0-9]""" \
-                                """(\+0[0-9]|1[0-2])?""")
 
     end=nxlog.find("[error]")
     ret=""
@@ -29,11 +31,6 @@ def parse_date(nxlog):
         if match:
             ret = match.group(0)
     return ret
-
-def test():
-    line="""2017-02-20T10:59:03+01:00 rp-ch-01 nginx: 2017/02/20 10:59:03 [error] 31557#0: *40698245 NAXSI_FMT: ip=37.70.112.1&server=www.astrowi.preprod-ch.bscast11.nbs-test.com&uri=/horoscope-voyance&learning=1&vers=0.55.3&total_processed=11&total_blocked=11&block=1&cscore0=$SQL&score0=40&cscore1=$XSS&score1=64&zone0=HEADERS&id0=1005&var_name0=cookie&zone1=HEADERS&id1=1010&var_name1=cookie&zone2=HEADERS&id2=1011&var_name2=cookie&zone3=HEADERS&id3=1315&var_name3=cookie, client: 37.70.112.1, server: www.astrowi.preprod-ch.bscast11.nbs-test.com, request: "GET /horoscope-voyance HTTP/1.1", host: "www.astrowi.preprod-ch.bscast11.nbs-test.com", referrer: "http://www.astrowi.preprod-ch.bscast11.nbs-test.com/"""
-    return parse_nxlog(line)
-
 
 def parse_nxlog(nxlog):
     """
@@ -78,11 +75,14 @@ def parse_nxlog(nxlog):
     min_dict['coords'] = coords(min_dict['ip'])
     
     for i in itertools.count():
-        if "id%d" % i in raw_dict and "var_name%d" %i in raw_dict and "zone%d" %i in raw_dict:
+        _id = "id%d" % i
+        _var_name = "var_name%d" % i
+        _zone = "zone%d" % i
+        if _id in raw_dict and _var_name in raw_dict and _zone in raw_dict:
             ret.append(copy.copy(min_dict))
-            ret[-1]['id'] = raw_dict['id%d' %i]
-            ret[-1]['var_name'] = raw_dict['var_name%d' %i]
-            ret[-1]['zone'] = raw_dict['zone%d' %i]
+            ret[-1]['id'] = raw_dict[_id]
+            ret[-1]['var_name'] = raw_dict[_var_name]
+            ret[-1]['zone'] = raw_dict[_zone]
         else:
             break
 
@@ -131,45 +131,14 @@ def unify_date(date):
     returns date object or None on error """
     out_date_format = "%Y%m%dT%H:%M:%S"
     idx = 0
-    res = ""
-    utc_shift=0
-    success = 0
-    supported_formats = [
-        "%b  %d %H:%M:%S",
-        "%b %d %H:%M:%S",
-        "%Y/%m/%d %H:%M:%S",
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%dT%H:%M:%S"
-    #            "%Y-%m-%dT%H:%M:%S+%:z"
-        ]
     # Seems coherent to store UTC time
     # The RFC 3339 specifies CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] as a format
-    # This is not RFC 3339 compliant...
     while date[idx] == " " or date[idx] == "\t":
         idx += 1
-        success = 0
-    for date_format in supported_formats:
-        # strptime does not support numeric time zone, hack.
-        idx = date.find("+")
-        if idx != -1:
-            utc_shift = date[idx:]
-            date = date[:idx]
-        try:
-            x = datetime.strptime(date, date_format)
-            x = x.replace(hour=x.hour+int(utc_shift))
-            # ugly hack when we don't have year
-            if x.year==1900:
-                x=x.replace(year=datetime.now().year)
-            z = x.strftime(out_date_format)
-            success = 1
-            break
-        except:
-            #print "'"+clean_date+"' not in format '"+date_format+"'"
-            pass
-    if success == 0:
-        logging.critical("Unable to parse date format :'"+date+"'")
-        return ""
-    return z
+    date=date[idx:]
+
+    date_obj=dateutil.parser.parse(date)
+    return date_obj.strftime(out_date_format)
 
 def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):
     ret=None
@@ -190,7 +159,7 @@ def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):
             return None
     r=None
     if ip_type==4:
-        gi = GeoIP.open(db, GeoIP.GEOIP_STANDARD)
+        gi = GeoIP.open(db, GeoIP.GEOIP_STANDARD |GeoIP.GEOIP_MEMORY_CACHE | GeoIP.GEOIP_CHECK_CACHE)
         r = gi.record_by_addr(ip)
     elif ip_type==6:
         pass

@@ -4,7 +4,7 @@ import re
 import socket
 import copy
 import itertools
-import dateutil
+import dateutil.parser
 
 try:
     from urlparse import parse_qs

@@ -42,7 +42,6 @@ def parse_nxlog(nxlog):
     errors = list()
     ret = list()
     raw_dict = dict()
-    #re.match(r'\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} \[error\]')
 
     date = parse_date(nxlog)
     start = nxlog.find("ip=")
@@ -79,7 +78,7 @@ def parse_nxlog(nxlog):
         _id = "id%d" % i
         _var_name = "var_name%d" % i
         _zone = "zone%d" % i
-        if _id in raw_dict and _var_name in raw_dict and _zone in raw_dict:
+        if {_id, _var_name, _zone}.issubset(raw_dict):
             ret.append(copy.copy(min_dict))
             ret[-1]['id'] = raw_dict[_id]
             ret[-1]['var_name'] = raw_dict[_var_name]

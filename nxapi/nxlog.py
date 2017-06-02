@@ -136,9 +136,6 @@ def unify_date(date):
     idx = 0
     # Seems coherent to store UTC time
     # The RFC 3339 specifies CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] as a format
-    while date[idx] == " " or date[idx] == "\t":
-        idx += 1
-    date=date[idx:]
     try:
         date_obj=dateutil.parser.parse(date)
     except valueError:

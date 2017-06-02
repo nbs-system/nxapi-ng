@@ -13,24 +13,25 @@ except ImportError:  # python3
 
 from . import rules
 
-date_regex = re.compile("""(((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"""\
-                        """\s+([0-3]?[0-9])|([0-2]0[0-3][0-9](/|-)(0?[1-9]|1[0-2])""" \
-                        """(/|-)([0-3]?[0-9])))\s+[0-2][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]""" \
+date_regex = re.compile("""(((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)""" \
+                        """\s+([0-3]?[0-9])|([0-2]0[0-3][0-9](/|-)(0?[0-9]|1[0-2])""" \
+                        """(/|-)([0-3][0-9])))\s+[0-1][0-9|2[0-3]):[0-5][0-9]:[0-5][0-9]""" \
                         """(\+0[0-9]|1[0-2])?""")
+
 
 def parse_date(nxlog):
     """
     :param str nxlog: A naxsi log ( https://github.com/nbs-system/naxsi/wiki/naxsilogs )
     :return string: date string or empty string if we fail to find a date
     """
-    errors = list()
+
+    end=nxlog.find("[error]")
     ret=""
-    match=re.search(date_regex, nxlog)
-    if match:
-        ret = match.group(0)
-    else:
-        errors.append("%s is not detected as a valid date." % nxlog)
-    return errors, ret
+    if end > 0:
+        match=re.search(date_regex, nxlog[:end])
+        if match:
+            ret = match.group(0)
+    return ret
 
 def parse_nxlog(nxlog):
     """
@@ -42,6 +43,7 @@ def parse_nxlog(nxlog):
     ret = list()
     raw_dict = dict()
 
+    date = parse_date(nxlog)
     start = nxlog.find("ip=")
     if start < 0:
         errors.append('%s is an invalid extlog or nxlog, string "ip=" not found.' % nxlog)
@@ -58,9 +60,6 @@ def parse_nxlog(nxlog):
         errors.append('%s is an invalid line: no [debug] or [error] found.' % nxlog)
         return errors, ret
 
-    error, date = parse_date(nxlog[:start])
-    errors.extend(error)
-    
     # Flatten the dict, since parse_qs is a bit annoying
     raw_dict = parse_qs(nxlog[start:end])
     for key, value in raw_dict.items():
@@ -72,16 +71,15 @@ def parse_nxlog(nxlog):
         if not key.startswith('id') and not key.startswith('zone') and not key.startswith('var_name'):
             min_dict[key]=raw_dict[key]
 
-    error, min_dict['date'] = unify_date(date)
-    errors.extend(error)
+    min_dict['date'] = unify_date(date)
     min_dict['coords'] = coords(min_dict['ip'])
     
     for i in itertools.count():
         _id = "id%d" % i
         _var_name = "var_name%d" % i
         _zone = "zone%d" % i
+        ret.append(copy.copy(min_dict))
         if {_id, _var_name, _zone}.issubset(raw_dict):
-            ret.append(copy.copy(min_dict))
             ret[-1]['id'] = raw_dict[_id]
             ret[-1]['var_name'] = raw_dict[_var_name]
             ret[-1]['zone'] = raw_dict[_zone]
@@ -131,17 +129,16 @@ def explain_nxlog(nxlog):
 def unify_date(date):
     """ tries to parse a text date,
     returns date object or None on error """
-    errors=list()
     out_date_format = "%Y%m%dT%H:%M:%S"
     idx = 0
     # Seems coherent to store UTC time
     # The RFC 3339 specifies CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] as a format
-    try:
-        date_obj=dateutil.parser.parse(date)
-    except valueError:
-        errors.append("Not able to parse the date")
-        return errors, ""
-    return errors, date_obj.strftime(out_date_format)
+    while date[idx] == " " or date[idx] == "\t":
+        idx += 1
+    date=date[idx:]
+
+    date_obj=dateutil.parser.parse(date)
+    return date_obj.strftime(out_date_format)
 
 def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):
     ret=None

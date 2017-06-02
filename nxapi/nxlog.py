@@ -13,11 +13,10 @@ except ImportError:  # python3
 
 from . import rules
 
-date_regex = re.compile("""(((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)""" \
-                        """\s+([0-3]?[0-9])|([0-2]0[0-3][0-9](/|-)(0?[0-9]|1[0-2])""" \
-                        """(/|-)([0-3][0-9])))\s+[0-1][0-9|2[0-3]):[0-5][0-9]:[0-5][0-9]""" \
+date_regex = re.compile("""(((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"""\
+                        """\s+([0-3]?[0-9])|([0-2]0[0-3][0-9](/|-)(0?[1-9]|1[0-2])""" \
+                        """(/|-)([0-3]?[0-9])))\s+[0-2][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]""" \
                         """(\+0[0-9]|1[0-2])?""")
-
 
 def parse_date(nxlog):
     """
@@ -43,7 +42,6 @@ def parse_nxlog(nxlog):
     ret = list()
     raw_dict = dict()
 
-    date = parse_date(nxlog)
     start = nxlog.find("ip=")
     if start < 0:
         errors.append('%s is an invalid extlog or nxlog, string "ip=" not found.' % nxlog)
@@ -59,6 +57,8 @@ def parse_nxlog(nxlog):
     else:
         errors.append('%s is an invalid line: no [debug] or [error] found.' % nxlog)
         return errors, ret
+
+    date = parse_date(nxlog)
 
     # Flatten the dict, since parse_qs is a bit annoying
     raw_dict = parse_qs(nxlog[start:end])

@@ -23,14 +23,14 @@ def parse_date(nxlog):
     :param str nxlog: A naxsi log ( https://github.com/nbs-system/naxsi/wiki/naxsilogs )
     :return string: date string or empty string if we fail to find a date
     """
-
-    end=nxlog.find("[error]")
+    errors = list()
     ret=""
-    if end > 0:
-        match=re.search(date_regex, nxlog[:end])
-        if match:
-            ret = match.group(0)
-    return ret
+    match=re.search(date_regex, nxlog)
+    if match:
+        ret = match.group(0)
+    else:
+        errors.append("%s is not detected as a valid date." % nxlog)
+    return errors, ret
 
 def parse_nxlog(nxlog):
     """
@@ -58,8 +58,9 @@ def parse_nxlog(nxlog):
         errors.append('%s is an invalid line: no [debug] or [error] found.' % nxlog)
         return errors, ret
 
-    date = parse_date(nxlog)
-
+    error, date = parse_date(nxlog[:start])
+    errors.extend(error)
+    
     # Flatten the dict, since parse_qs is a bit annoying
     raw_dict = parse_qs(nxlog[start:end])
     for key, value in raw_dict.items():
@@ -71,7 +72,8 @@ def parse_nxlog(nxlog):
         if not key.startswith('id') and not key.startswith('zone') and not key.startswith('var_name'):
             min_dict[key]=raw_dict[key]
 
-    min_dict['date'] = unify_date(date)
+    error, min_dict['date'] = unify_date(date)
+    errors.extend(error)
     min_dict['coords'] = coords(min_dict['ip'])
     
     for i in itertools.count():
@@ -129,6 +131,7 @@ def explain_nxlog(nxlog):
 def unify_date(date):
     """ tries to parse a text date,
     returns date object or None on error """
+    errors=list()
     out_date_format = "%Y%m%dT%H:%M:%S"
     idx = 0
     # Seems coherent to store UTC time
@@ -136,9 +139,12 @@ def unify_date(date):
     while date[idx] == " " or date[idx] == "\t":
         idx += 1
     date=date[idx:]
-
-    date_obj=dateutil.parser.parse(date)
-    return date_obj.strftime(out_date_format)
+    try:
+        date_obj=dateutil.parser.parse(date)
+    except valueError:
+        errors.append("Not able to parse the date")
+        return errors, ""
+    return errors, date_obj.strftime(out_date_format)
 
 def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):
     ret=None

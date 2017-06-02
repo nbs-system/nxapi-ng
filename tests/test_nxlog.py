@@ -74,7 +74,9 @@ class TestProcessing(TestCase):
         ret=list()
         for _line in _nxlog:
             ret.append(nxlog.parse_date(_line))
-        self.assertEqual(ret, ['2013/11/10 07:36:19', '2013/3/10 14:36:19', '2013-3-10 07:36:19', 'Feb   4 07:36:19', 'Feb   4 07:36:19']) 
+        self.assertEqual(ret, [([], '2013/11/10 07:36:19'),([], '2013/3/10 14:36:19'),  ([], '2013-3-10 07:36:19'),
+                                   ([], 'Feb   4 07:36:19'),([], 'Feb   4 07:36:19')])
+
 
     def test_unify_date(self):
         _dates=['2013/11/10 07:36:19', '2013/3/10 14:36:19', '2013-3-10 07:36:19', 'Jul 07   07:36:19', 'Feb  4 07:36:19']
@@ -82,7 +84,11 @@ class TestProcessing(TestCase):
 
         for _date in _dates:
             ret.append(nxlog.unify_date(_date))
-        self.assertEqual(ret, ['20131110T07:36:19', '20130310T14:36:19', '20130310T07:36:19', '20170707T07:36:19', '20170204T07:36:19'])
+        self.assertEqual(ret, [([], '20131110T07:36:19'),
+                                   ([], '20130310T14:36:19'),
+                                   ([], '20130310T07:36:19'),
+                                   ([], '20170707T07:36:19'),
+                                   ([], '20170204T07:36:19')])
         
     def test_coords(self):
         _ips=['198.41.0.4', '192.33.4.12', '192.5.5.241', '2001:500:9f::42', '2001:500:84::b' ]

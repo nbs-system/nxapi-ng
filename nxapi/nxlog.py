@@ -132,11 +132,15 @@ def unify_date(date):
     idx = 0
     # Seems coherent to store UTC time
     # The RFC 3339 specifies CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] as a format
+    if len(date)==0:
+        return ""
     while date[idx] == " " or date[idx] == "\t":
         idx += 1
     date=date[idx:]
-
-    date_obj=dateutil.parser.parse(date)
+    try:
+        date_obj=dateutil.parser.parse(date)
+    except:
+        return ""
     return date_obj.strftime(out_date_format)
 
 def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):

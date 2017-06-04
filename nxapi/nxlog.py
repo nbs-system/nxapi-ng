@@ -74,18 +74,17 @@ def parse_nxlog(nxlog):
     min_dict['date'] = unify_date(date)
     min_dict['coords'] = coords(min_dict['ip'])
     
-    ret.append(copy.copy(min_dict))
     for i in itertools.count():
         _id = "id%d" % i
         _var_name = "var_name%d" % i
         _zone = "zone%d" % i
         if {_id, _var_name, _zone}.issubset(raw_dict):
+            ret.append(copy.copy(min_dict))
             ret[-1]['id'] = raw_dict[_id]
             ret[-1]['var_name'] = raw_dict[_var_name]
             ret[-1]['zone'] = raw_dict[_zone]
         else:
             break
-        ret.append(copy.copy(min_dict))
 
     return list(), ret
 

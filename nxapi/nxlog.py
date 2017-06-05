@@ -83,6 +83,8 @@ def parse_nxlog(nxlog):
             ret[-1]['id'] = raw_dict[_id]
             ret[-1]['var_name'] = raw_dict[_var_name]
             ret[-1]['zone'] = raw_dict[_zone]
+        elif i==0:
+            ret.append(copy.copy(min_dict))
         else:
             break
 

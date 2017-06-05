@@ -83,8 +83,11 @@ def parse_nxlog(nxlog):
             ret[-1]['id'] = raw_dict[_id]
             ret[-1]['var_name'] = raw_dict[_var_name]
             ret[-1]['zone'] = raw_dict[_zone]
-        elif i==0:
+        elif i==0:   #We may be in a debug line, we get all what we have
             ret.append(copy.copy(min_dict))
+            for key in ['id', 'var_name', 'zone']:
+                if key in raw_dict:
+                    ret[-1][key] = raw_dict[key]
         else:
             break
 

@@ -83,9 +83,13 @@ def parse_nxlog(nxlog):
             ret[-1]['id'] = raw_dict[_id]
             ret[-1]['var_name'] = raw_dict[_var_name]
             ret[-1]['zone'] = raw_dict[_zone]
+        elif i==0:   #We may be in a debug line, we get all what we have
+            ret.append(copy.copy(min_dict))
+            for key in ['id', 'var_name', 'zone']:
+                if key in raw_dict:
+                    ret[-1][key] = raw_dict[key]
         else:
             break
-
 
     return list(), ret
 
@@ -133,11 +137,15 @@ def unify_date(date):
     idx = 0
     # Seems coherent to store UTC time
     # The RFC 3339 specifies CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm] as a format
+    if not date:
+        return ""
     while date[idx] == " " or date[idx] == "\t":
         idx += 1
     date=date[idx:]
-
-    date_obj=dateutil.parser.parse(date)
+    try:
+        date_obj=dateutil.parser.parse(date)
+    except:
+        return ""
     return date_obj.strftime(out_date_format)
 
 def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):

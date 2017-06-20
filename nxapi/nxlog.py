@@ -61,7 +61,7 @@ def parse_nxlog(nxlog):
         return errors, ret
 
     # Flatten the dict, since parse_qs is a bit annoying
-    raw_dict = parse_qs(nxlog[start:end])
+    raw_dict = parse_qs(nxlog[start:end], keep_blank_values=True)
     for key, value in raw_dict.items():
         raw_dict[key] = value[0]
 
@@ -78,11 +78,11 @@ def parse_nxlog(nxlog):
         _id = "id%d" % i
         _var_name = "var_name%d" % i
         _zone = "zone%d" % i
-        if {_id, _var_name, _zone}.issubset(raw_dict):
+        if {_id, _zone, _var_name}.issubset(raw_dict): #In case of an empty POST request we have an empty var_name...
             ret.append(copy.copy(min_dict))
             ret[-1]['id'] = raw_dict[_id]
-            ret[-1]['var_name'] = raw_dict[_var_name]
             ret[-1]['zone'] = raw_dict[_zone]
+            ret[-1]['var_name'] = raw_dict[_var_name]
         elif i==0:   #We may be in a debug line, we get all what we have
             ret.append(copy.copy(min_dict))
             for key in ['id', 'var_name', 'zone']:

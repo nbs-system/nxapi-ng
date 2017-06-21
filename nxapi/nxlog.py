@@ -25,10 +25,10 @@ def parse_date(nxlog):
     :return string: date string or empty string if we fail to find a date
     """
 
-    end=nxlog.find("[error]")
-    ret=""
+    end = max([nxlog.find(s) for s in ["[error]", "[debug]"]])
+    ret = ""
     if end > 0:
-        match=re.search(date_regex, nxlog[:end])
+        match = re.search(date_regex, nxlog[:end])
         if match:
             ret = match.group(0)
     return ret

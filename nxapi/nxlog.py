@@ -149,7 +149,7 @@ def unify_date(date):
     return date_obj.strftime(out_date_format)
 
 def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):
-    ret=None
+    ret = None
     try:
         import GeoIP
     except:
@@ -157,21 +157,22 @@ def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):
         return ret
     try:
         socket.inet_aton(ip)
-        ip_type=4
+        ip_type = 4
     except socket.error:
         try:
             socket.inet_pton(socket.AF_INET6, ip)
-            ip_type=6
+            ip_type = 6
         except socket.error:
             logging.warning("Ip %s is not parseable" % ip)
             return None
     r=None
-    if ip_type==4:
-        gi = GeoIP.open(db, GeoIP.GEOIP_STANDARD |GeoIP.GEOIP_MEMORY_CACHE | GeoIP.GEOIP_CHECK_CACHE)
-        r = gi.record_by_addr(ip)
-    elif ip_type==6:
+    if ip_type == 4:
+        if not hasattr(coords, "gi"):
+            coords.gi = GeoIP.open(db, GeoIP.GEOIP_STANDARD |GeoIP.GEOIP_MEMORY_CACHE | GeoIP.GEOIP_CHECK_CACHE)
+        r = coords.gi.record_by_addr(ip)
+    elif ip_type == 6:
         pass
     # For the moment there's no useable open ipv6 city database
     if r is not None:
-        ret= "[%f, %f]" % (round(float(r['latitude']),4), round(float(r['longitude']),4))
+        ret = "[%f, %f]" % (round(float(r['latitude']),4), round(float(r['longitude']),4))
     return ret

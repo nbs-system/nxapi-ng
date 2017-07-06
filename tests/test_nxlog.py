@@ -90,4 +90,4 @@ class TestProcessing(TestCase):
         ret=list()
         for _ip in _ips:
             ret.append(nxlog.coords(_ip, db='nxapi/data/GeoIPCity_stripped_down.dat'))
-        self.assertEqual(ret, ['[38.959900, -77.342800]', '[37.751000, -97.822000]', '[37.751000, -97.822000]', None, None])                    
+        self.assertEqual(ret, ['38.959900, -77.342800', '37.751000, -97.822000', '37.751000, -97.822000', None, None])

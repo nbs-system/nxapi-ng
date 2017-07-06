@@ -174,5 +174,5 @@ def coords(ip, db='/usr/share/GeoIP/GeoIPCity.dat'):
         pass
     # For the moment there's no useable open ipv6 city database
     if r is not None:
-        ret = "[%f, %f]" % (round(float(r['latitude']),4), round(float(r['longitude']),4))
+        ret= "%f, %f" % (round(float(r['latitude']),4), round(float(r['longitude']),4))
     return ret

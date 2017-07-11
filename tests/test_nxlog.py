@@ -18,6 +18,11 @@ class TestProcessing(TestCase):
         _nxlog[1] += 'zone1=HEADERS&id1=1010&var_name1=cookie&zone2=HEADERS&id2=1011&var_name2=cookie&zone3=HEADERS&'
         _nxlog[1] += 'id3=1315&var_name3=cookie, client: X.X.X.X, server: Y.Y.Y.Y, request: "GET /bidon HTTP/1.1", '
         _nxlog[1] += 'host: "Y.Y.Y.Y", referrer: "http://Y.Y.Y.X/"'
+        _nxlog.append('2017-05-16T10:21:17+02:00 rp-ch-01 nginx: 2017/05/16 10:21:17 [error] 1047#0: *939993493 ')
+        _nxlog[2] += 'NAXSI_FMT: ip=X.X.X.X&server=www.example.com&uri=/fdd%C1%81163xyzc&learning=1&vers=0.55.3&'
+        _nxlog[2] += 'total_processed=424242&total_blocked=4242&block=1&cscore0=$SQL&score0=42&cscore1=$XSS&score1=84'
+        _nxlog[2] += '&zone0=HEADERS&id0=1005&var_name0=cookie, client: X.X.X.X, server: www.example.com request: '
+        _nxlog[2] += '"GET /fdd%C1%81163xyzc HTTP/1.1", host: "www.example.com", referrer: "http://www.example.com/outside"'
         t = list()
         for _line in _nxlog:
             errors, t = nxlog.parse_nxlog(_line)
@@ -47,7 +52,14 @@ class TestProcessing(TestCase):
                                      'cscore1': '$XSS', 'ip': 'X.X.X.X', 'uri': '/bidon', 'server': 'Y.Y.Y.Y',
                                 'var_name': 'cookie', 'score0': '40', 'score1': '64', 'total_blocked': '11',
                                 'date': '20170220T10:59:03', 'coords': None, 'zone': 'HEADERS',
-                                'id': '1315', 'block': '1'}])
+                                'id': '1315', 'block': '1'},
+                               {'block': '1', 'coords': None, 'cscore0': '$SQL', 'cscore1': '$XSS',
+                                'date': '20170516T10:21:17', 'id': '1005', 'ip': 'X.X.X.X', 'learning': '1',
+                                'score0': '42', 'score1': '84', 'server': 'www.example.com', 'total_blocked': '4242',
+                                'total_processed': '424242',
+                                'uri': ('/fdd??163xyzc' if nxlog.PY2 else '/fdd\ufffd\ufffd163xyzc'), 'var_name': 'cookie',
+                                'vers': '0.55.3', 'zone': 'HEADERS'}]
+                         )
 
     def test_parse_date(self):
         _nxlog = list()

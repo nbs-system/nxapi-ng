@@ -5,6 +5,12 @@ import socket
 import copy
 import itertools
 import dateutil.parser
+import sys
+
+if sys.version_info[0] == 2:
+    PY2 = True
+else:
+    PY2 = False
 
 try:
     from urlparse import parse_qs
@@ -63,7 +69,10 @@ def parse_nxlog(nxlog):
     # Flatten the dict, since parse_qs is a bit annoying
     raw_dict = parse_qs(nxlog[start:end], keep_blank_values=True)
     for key, value in raw_dict.items():
-        raw_dict[key] = value[0]
+        if PY2:
+            raw_dict[key] = value[0].decode('ascii', errors='replace').encode('ascii', errors='replace')
+        else:
+            raw_dict[key] = value[0]
 
     # We may have a multi-line event
     min_dict = dict()
